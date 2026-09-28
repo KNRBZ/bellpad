@@ -4,7 +4,7 @@
   "name": "BellPad",
   "game": "Animal Crossing (GameCube) via the ACGC decompilation and Aurora",
   "kind": "decomp-patches",
-  "status": "draft-untested",
+  "status": "experimental",
   "inputs": [
     {
       "type": "gamecube-disc",
