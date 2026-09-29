@@ -18,6 +18,14 @@ esac
 "$script_dir/fetch-desktop-baseline.sh"
 "$script_dir/fetch-aurora.sh"
 
+# One version for the app, its release and PadForge: version.json, stamped into
+# a copy of the product Info.plist.
+mkdir -p "$build_dir"
+info_plist="$build_dir/BellPad-Info.plist"
+cp "$repo_root/apple/ios/Info.plist" "$info_plist"
+plutil -replace CFBundleShortVersionString -string "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$repo_root/version.json")" "$info_plist"
+plutil -replace CFBundleVersion -string "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build"])' "$repo_root/version.json")" "$info_plist"
+
 cmake -S "$core_dir/pc" -B "$build_dir" -G Ninja \
     -DCMAKE_SYSTEM_NAME=iOS \
     -DCMAKE_OSX_SYSROOT=iphoneos \
@@ -36,7 +44,7 @@ cmake -S "$core_dir/pc" -B "$build_dir" -G Ninja \
     -DPNG_TOOLS=OFF \
     -DBELLPAD_AURORA_LINK_PROBE=ON \
     -DBELLPAD_AURORA_SOURCE_DIR="$aurora_dir" \
-    -DBELLPAD_IOS_INFO_PLIST="$repo_root/apple/ios/Info.plist" \
+    -DBELLPAD_IOS_INFO_PLIST="$info_plist" \
     -DBELLPAD_PRODUCT_SOURCE_DIR="$repo_root" \
     -DFETCHCONTENT_BASE_DIR="$dependency_dir"
 cmake --build "$build_dir" --target ac_aurora --parallel
