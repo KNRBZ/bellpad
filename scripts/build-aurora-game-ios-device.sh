@@ -18,7 +18,7 @@ esac
 "$script_dir/fetch-desktop-baseline.sh"
 "$script_dir/fetch-aurora.sh"
 
-# One version for the app, its release and PadForge: version.json, stamped into
+# One version for the app, its release and PadMint: version.json, stamped into
 # a copy of the product Info.plist.
 mkdir -p "$build_dir"
 info_plist="$build_dir/BellPad-Info.plist"

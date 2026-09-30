@@ -37,8 +37,8 @@ contributing to the project.
 Releases publish no app: BellPad is compiled from the Animal Crossing
 decompilation, so you make your own. On an Apple Silicon Mac with Xcode and
 `brew install cmake ninja ripgrep sdl2`, download
-[PadForge](https://github.com/chrissotraidis/padforge/releases/latest), unzip it,
-double-click `PadForge.command` and choose BellPad. PadForge builds the app
+[PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it,
+double-click `PadMint.command` and choose BellPad. PadMint builds the app
 from this repository's latest release and saves an unsigned IPA for iOS or
 iPadOS 17.0 or later. Install it with AltStore Classic, SideStore or
 Sideloadly, then provide your own supported game data after launch (see
@@ -51,7 +51,7 @@ Sideloadly, then provide your own supported game data after launch (see
 | Apple Silicon macOS | **Playable baseline** | The native `Bellpad.app` reaches a generated town, creates/reloads a Dolphin-compatible GCI save, and has desktop rendering/input evidence. |
 | iPhone and iPad Simulator | **Current development target** | Files import, retained game data, Metal rendering, touch input, native name entry, save import/export, and relaunch have evidence on sequential Simulator runs. |
 | ARM64 iPhone/iPad device build | **Physical iPad validated** | Local version 0.1.0 build 6 was signed and installed in place; on-device logs confirm retained-image validation and save preparation at startup. Preview 3 provides this same audited build 6. Game data, saves, controller settings, and touch preferences were byte-identical after readback. Physical controller scenarios remain acceptance gates. |
-| Make your own with PadForge | **Available** | See [Get BellPad](#get-bellpad). Releases hold the recipe only. |
+| Make your own with PadMint | **Available** | See [Get BellPad](#get-bellpad). Releases hold the recipe only. |
 | App Store / TestFlight | **Not available** | BellPad is not store-distributed. |
 
 The source-release workflow verifies the clean-room and reproducibility gates
