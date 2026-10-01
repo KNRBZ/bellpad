@@ -87,7 +87,9 @@
         "name": "rg",
         "version_args": [
           "--version"
-        ]
+        ],
+        "player": true,
+        "note": "Install ripgrep for the packaging checks: brew install ripgrep"
       },
       {
         "name": "xcodebuild",
