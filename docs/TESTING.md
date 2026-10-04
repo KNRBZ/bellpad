@@ -20,7 +20,7 @@ No gameplay test is marked passed without a dated result, device/OS, build revis
 |---|---|---|
 | Configure/build native ARM64 | Mach-O arm64 executable | Pass — 2026-08-03, M2/macOS 26.5; independent full builds with Apple Clang 21.0.0 and GCC 16.1.0 |
 | Apple toolchain runtime smoke test | Native binary reaches visible game output | Pass — Apple Clang build rendered the title correctly at 60 FPS using the ignored supported image |
-| Validate supported disc | Accept `GAFE01` USA Rev 0 only | Pass for raw ISO/GCM — header/revision, exact full/trimmed size, and streamed meaningful-payload SHA-256 are enforced; compressed formats pending |
+| Validate supported disc | Accept `GAFE01` USA Rev 0 only | Pass for raw ISO/GCM — header/revision, exact full/trimmed size, and streamed meaningful-payload SHA-256 are enforced; since 0.2.1 a full-size image whose prefix differs is accepted by its whole-file Redump SHA-1 (`2d2b1fa3…`); compressed formats pending |
 | Trademark/title | Correct render/audio/input | Partial pass — correct 60 FPS rendering and 32 kHz stereo; A/Start works through a latched native test path; cleanup overflow fixed; repeatable UI automation pending |
 | Character/town creation | Completes with text entry | Pass for baseline — Bell/Cove setup, train, generated town, initialized save state, and saved-player relaunch flow completed; later tutorial breadth is covered by the separate Cedar run |
 | Enter town | Stable outdoor rendering and movement | Pass — station exit, outdoor movement, Nook greeting, and housing area observed |
@@ -115,7 +115,7 @@ scene/orientation/safe-area policy and adaptive touch controls.
 | Sequential stop | Pass — iPhone app terminated and simulator shut down before iPad boot |
 | iPad Pro 13-inch Simulator | Pass — universal bundle installs/launches in a 960×640 resizable iPadOS window; actual-size scaling selects a compact no-overlap layout |
 | Expanded iPad layout | Pass on the real game target — iPad metrics are visibly applied over the 2752×2064 Aurora framebuffer; current iPadOS may still manage the game in a system window |
-| Shared disc validator | Pass — synthetic tests cover exact trimmed/full lengths, valid payload SHA-256, hash mismatch, wrong size/revision/game, and `.rvz` rejection; optional ignored retail-image integration passes with no retail fixture tracked |
+| Shared disc validator | Pass — synthetic tests cover exact trimmed/full lengths, valid payload SHA-256, hash mismatch, whole-disc SHA-1 match/mismatch, trimmed-size rejection of the SHA-1 path, wrong size/revision/game, and `.rvz` rejection; optional ignored retail-image integration passes with no retail fixture tracked. A real Redump image has not been tested |
 | iPhone Files picker | Pass — Computer Use activated “Choose Game Data…” and observed Apple's native Files/Recents UI; cancel returned cleanly, and later product tests exercised invalid and valid selections |
 | macOS open panel | Pass — native sheet presented with ISO/GCM content filtering; cancelled without selecting a file |
 | Shell game rendering/input | Superseded — the product overlay is now linked directly into the Aurora game bundle |
