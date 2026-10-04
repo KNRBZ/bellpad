@@ -21,6 +21,10 @@ struct BellpadDiscFingerprint {
     std::uintmax_t payloadSize = 0;
     std::uintmax_t fullImageSize = 0;
     std::array<std::uint8_t, 32> payloadSha256{};
+    // Whole-file SHA-1 of the untouched full disc (the Redump/GameTDB record). A full image
+    // whose payload prefix differs, because its files sit elsewhere on the disc, is accepted
+    // when this matches. All zero disables the check.
+    std::array<std::uint8_t, 20> fullImageSha1{};
 };
 
 struct BellpadDiscValidationResult {

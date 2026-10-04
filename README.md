@@ -102,7 +102,12 @@ supported compatibility target is the original US revision:
 
 | Game ID | Region | Revision | Accepted application input |
 |---|---|---|---|
-| `GAFE01` | USA | 0 | Validated raw ISO/GCM at the verified full or trimmed size |
+| `GAFE01` | USA | 0 | Uncompressed 1:1 ISO/GCM (Redump SHA-1 `2d2b1fa3883f49af779ce9ca133db3be17be8f32`, 1,459,978,240 bytes) or BellPad's verified trimmed form |
+
+To check a dump before copying it to your phone, run `shasum -a 1` on it (or
+`Get-FileHash -Algorithm SHA1` in PowerShell) and compare with the SHA-1 above.
+RVZ, CISO and NKit files must first be converted back to a plain ISO, for
+example with Dolphin's Convert File.
 
 On macOS, the app asks for the image once with a native file chooser and
 remembers it, so later launches start straight into the game. Run it with
