@@ -11,6 +11,8 @@
   <img alt="Apple Silicon macOS" src="https://img.shields.io/badge/macOS-Apple%20Silicon-30D158?logo=apple">
   <img alt="Metal renderer" src="https://img.shields.io/badge/renderer-Metal-5E5CE6">
   <img alt="game data not included" src="https://img.shields.io/badge/game%20data-not%20included-FF453A">
+  <a href="https://github.com/chrissotraidis/padmint"><img alt="Build BellPad with PadMint" src="https://img.shields.io/badge/PadMint-build%20your%20own-3EB489"></a>
+  <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the BellPad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
 </p>
 
 ![BellPad running in a town on iPad](docs/readme/bellpad-town.png)
@@ -32,6 +34,13 @@ obtained, supported game data locally after building or installing BellPad.
 Read the scoped [legal and clean-room boundary](docs/LEGAL.md) before using or
 contributing to the project.
 
+> [!NOTE]
+> **AI disclosure:** BellPad uses substantial AI assistance for code, tests,
+> documentation, debugging and maintenance. Some support replies and maintenance
+> tasks are automated. There is no audited percentage of AI-generated code.
+> Build, test and device records describe what was checked. This disclosure
+> concerns BellPad's workflow, not the authorship of its upstream projects.
+
 ## Get BellPad
 
 Releases publish no app: BellPad is compiled from the Animal Crossing
@@ -51,7 +60,7 @@ Sideloadly, then provide your own supported game data after launch (see
 | Apple Silicon macOS | **Playable baseline** | The native `Bellpad.app` reaches a generated town, creates/reloads a Dolphin-compatible GCI save, and has desktop rendering/input evidence. |
 | iPhone and iPad Simulator | **Current development target** | Files import, retained game data, Metal rendering, touch input, native name entry, save import/export, and relaunch have evidence on sequential Simulator runs. |
 | ARM64 iPhone/iPad device build | **Physical iPad validated** | Local version 0.1.0 build 6 was signed and installed in place; on-device logs confirm retained-image validation and save preparation at startup. Preview 3 provides this same audited build 6. Game data, saves, controller settings, and touch preferences were byte-identical after readback. Physical controller scenarios remain acceptance gates. |
-| Make your own with PadMint | **Available** | See [Get BellPad](#get-bellpad). Releases hold the recipe only. |
+| Make your own with PadMint | **Available (0.2.1)** | See [Get BellPad](#get-bellpad). Releases hold the recipe only. PadMint 0.3.5 built 0.2.1 end to end from the release on an Apple Silicon Mac. Windows and Linux build hosts are not supported yet. |
 | App Store / TestFlight | **Not available** | BellPad is not store-distributed. |
 
 The source-release workflow verifies the clean-room and reproducibility gates
@@ -238,6 +247,16 @@ The full, player-visible list is maintained in [TECH_DEBT.md](docs/TECH_DEBT.md)
 
 Generated source trees, build directories, game data, extracted assets, saves,
 signed apps, packages, and credentials are ignored and must never be committed.
+
+## Community and support
+
+[Join the Discord](https://discord.gg/xwHfUD2bxW) for help and news. It is one
+community for BellPad and its sibling projects, such as KartPad, BlueWake and
+MeleePad: ask about setup, building with PadMint, and installing, share how it
+runs on your device, and hear about new releases first.
+
+Found a bug? [Open an issue](https://github.com/chrissotraidis/bellpad/issues)
+with your device, its OS version, and the steps that led to it.
 
 ## Research, credits, and legal
 
