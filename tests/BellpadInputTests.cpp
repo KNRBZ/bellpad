@@ -201,6 +201,24 @@ int main() {
            BellpadDiscValidationCode::HashMismatch);
     std::filesystem::remove(mismatchPath);
 
+    // A 1:1 dump keeps the disc's own layout, so its prefix differs; the whole-disc SHA-1 decides.
+    BellpadDiscFingerprint wholeDiscFingerprint = wrongFingerprint;
+    wholeDiscFingerprint.fullImageSha1 = {
+        0x58, 0x97, 0x1C, 0x9A, 0xA5, 0x50, 0x55, 0x44, 0x27, 0x85,
+        0x31, 0xF9, 0xDA, 0x28, 0x78, 0x8C, 0x71, 0xDF, 0xE7, 0xAD,
+    };
+    const auto wholeDiscPath = writeSyntheticHeader(header, ".iso", 0x40);
+    assert(BellpadValidateDiscImage(wholeDiscPath, wholeDiscFingerprint).valid());
+    BellpadDiscFingerprint wrongWholeDisc = wholeDiscFingerprint;
+    wrongWholeDisc.fullImageSha1.back() ^= 1;
+    assert(BellpadValidateDiscImage(wholeDiscPath, wrongWholeDisc).code ==
+           BellpadDiscValidationCode::HashMismatch);
+    std::filesystem::remove(wholeDiscPath);
+    const auto trimmedWithWholeDiscPath = writeSyntheticHeader(header, ".iso");
+    assert(BellpadValidateDiscImage(trimmedWithWholeDiscPath, wholeDiscFingerprint).code ==
+           BellpadDiscValidationCode::HashMismatch);
+    std::filesystem::remove(trimmedWithWholeDiscPath);
+
     header[7] = 1;
     const auto revisionPath = writeSyntheticHeader(header, ".gcm");
     assert(BellpadValidateDiscImage(revisionPath).code == BellpadDiscValidationCode::UnsupportedRevision);
@@ -220,8 +238,10 @@ int main() {
         const auto retailResult = BellpadValidateDiscImage(retailImage);
         assert(retailResult.valid());
         assert(retailResult.fileSize == 27'573'708 || retailResult.fileSize == 1'459'978'240);
-        assert(retailResult.payloadSha256 ==
-               "7bdc4fcf4a209521ba59d8fc850bc5b5d21ea96002a225224e83e3efe52d4615");
+        if (retailResult.fileSize == 27'573'708) {
+            assert(retailResult.payloadSha256 ==
+                   "7bdc4fcf4a209521ba59d8fc850bc5b5d21ea96002a225224e83e3efe52d4615");
+        }
     }
 
     std::vector<std::uint8_t> gci(BellpadExpectedGCISize);

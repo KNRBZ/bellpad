@@ -1,5 +1,7 @@
 #include "BellpadDiscValidator.h"
 
+#include <CommonCrypto/CommonDigest.h>
+
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -7,6 +9,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
 namespace {
 
@@ -19,6 +22,9 @@ constexpr BellpadDiscFingerprint kSupportedFingerprint{
      0xBA, 0x59, 0xD8, 0xFC, 0x85, 0x0B, 0xC5, 0xB5,
      0xD2, 0x1E, 0xA9, 0x60, 0x02, 0xA2, 0x25, 0x22,
      0x4E, 0x83, 0xE3, 0xEF, 0xE5, 0x2D, 0x46, 0x15},
+    // Redump/GameTDB GAFE01 Rev 0: SHA-1 2d2b1fa3883f49af779ce9ca133db3be17be8f32.
+    {0x2D, 0x2B, 0x1F, 0xA3, 0x88, 0x3F, 0x49, 0xAF, 0x77, 0x9C,
+     0xE9, 0xCA, 0x13, 0x3D, 0xB3, 0xBE, 0x17, 0xBE, 0x8F, 0x32},
 };
 
 constexpr std::array<std::uint32_t, 64> kSha256RoundConstants{
@@ -164,6 +170,31 @@ bool hashPrefix(std::ifstream& stream,
     return true;
 }
 
+// Identifies the whole retail disc by its published checksum; this is not a security boundary.
+bool hashWholeFileSha1(std::ifstream& stream,
+                       std::uintmax_t byteCount,
+                       std::array<std::uint8_t, 20>& digest) {
+    stream.clear();
+    stream.seekg(0, std::ios::beg);
+    if (!stream) return false;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    CC_SHA1_CTX context;
+    CC_SHA1_Init(&context);
+    std::vector<char> buffer(1 << 20);
+    while (byteCount > 0) {
+        const std::size_t requested = static_cast<std::size_t>(
+            std::min<std::uintmax_t>(byteCount, buffer.size()));
+        if (!stream.read(buffer.data(), requested)) return false;
+        CC_SHA1_Update(&context, buffer.data(), static_cast<CC_LONG>(requested));
+        byteCount -= requested;
+    }
+    CC_SHA1_Final(digest.data(), &context);
+#pragma clang diagnostic pop
+    return true;
+}
+
 std::string lowercaseExtension(const std::filesystem::path& path) {
     std::string extension = path.extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char value) {
@@ -233,7 +264,20 @@ BellpadDiscValidationResult BellpadValidateDiscImage(
         return result;
     }
     result.payloadSha256 = hexDigest(digest);
-    result.code = digest == fingerprint.payloadSha256
+    if (digest == fingerprint.payloadSha256) {
+        result.code = BellpadDiscValidationCode::Valid;
+        return result;
+    }
+
+    // An untouched 1:1 dump keeps Nintendo's own file layout, so its first bytes differ from a
+    // rebuilt or trimmed image. Recognise it by the published whole-disc checksum instead.
+    std::array<std::uint8_t, 20> wholeDigest{};
+    const bool wholeDiscMatches =
+        result.fileSize == fingerprint.fullImageSize &&
+        fingerprint.fullImageSha1 != std::array<std::uint8_t, 20>{} &&
+        hashWholeFileSha1(stream, result.fileSize, wholeDigest) &&
+        wholeDigest == fingerprint.fullImageSha1;
+    result.code = wholeDiscMatches
         ? BellpadDiscValidationCode::Valid
         : BellpadDiscValidationCode::HashMismatch;
     return result;
@@ -260,9 +304,9 @@ std::string BellpadDiscValidationMessage(const BellpadDiscValidationResult& resu
     case BellpadDiscValidationCode::UnsupportedRevision:
         return "Game revision " + std::to_string(result.revision) + " is not supported; Bellpad currently requires revision 0.";
     case BellpadDiscValidationCode::UnsupportedSize:
-        return "This GAFE01 image has an unsupported size. Bellpad accepts the verified full retail image or its exact trimmed payload form.";
+        return "This GAFE01 image has an unsupported size. BellPad accepts an uncompressed 1:1 dump (1,459,978,240 bytes) or its verified trimmed form.";
     case BellpadDiscValidationCode::HashMismatch:
-        return "This GAFE01 image does not match the supported revision's content fingerprint.";
+        return "This GAFE01 image does not match the USA Rev 0 disc. BellPad accepts an uncompressed 1:1 dump (Redump SHA-1 2d2b1fa3…) or its verified trimmed form.";
     }
     return "Unknown disc validation result.";
 }

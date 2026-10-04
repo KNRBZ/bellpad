@@ -164,7 +164,10 @@ the first 0x20 bytes of raw `.iso`/`.gcm`, checks the GameCube magic at `0x1C`,
 the six-byte game ID, disc number, and revision byte, requires either the exact
 trimmed-payload or standard full-disc length, and streams SHA-256 over the entire
 meaningful payload. The full and trimmed forms share that payload fingerprint;
-full-disc padding is not executed game content. UIKit balances security-scoped
+full-disc padding is not executed game content. An untouched 1:1 dump keeps the
+disc's own file layout, so its prefix differs from the trimmed form; a full-length
+image whose prefix does not match is accepted when its whole-file SHA-1 equals the
+published Redump record. UIKit balances security-scoped
 access around source validation and copy.
 It copies to `Game Data/Animal Crossing.importing.iso`, validates the completed
 copy, and atomically installs `Game Data/Animal Crossing.iso` under Bellpad's
