@@ -349,7 +349,7 @@ static BellpadPadState BellpadStateFromGamepad(GCExtendedGamepad *gamepad) {
 
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     _metalView = [[MTKView alloc] initWithFrame:self.view.bounds device:device];
-    _metalView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _metalView.autoresizingMask = UIViewAutoresizingNone;
     _metalView.preferredFramesPerSecond = 60;
     _metalView.enableSetNeedsDisplay = NO;
     _metalView.paused = NO;
@@ -421,6 +421,22 @@ static BellpadPadState BellpadStateFromGamepad(GCExtendedGamepad *gamepad) {
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     UIEdgeInsets insets = self.view.safeAreaInsets;
+    // Keep the GameCube render surface at its native 4:3 aspect ratio.
+    // The iPhone display is much wider than 4:3 in landscape, so aspect-fit it
+    // and leave the unused horizontal area black instead of stretching the game.
+    CGRect gameBounds = UIEdgeInsetsInsetRect(self.view.bounds, self.view.safeAreaInsets);
+    CGFloat gameAspect = 4.0 / 3.0;
+    CGFloat gameWidth = gameBounds.size.width;
+    CGFloat gameHeight = gameWidth / gameAspect;
+    if (gameHeight > gameBounds.size.height) {
+        gameHeight = gameBounds.size.height;
+        gameWidth = gameHeight * gameAspect;
+    }
+    _metalView.frame = CGRectMake(CGRectGetMidX(gameBounds) - gameWidth * 0.5,
+                                  CGRectGetMidY(gameBounds) - gameHeight * 0.5,
+                                  gameWidth,
+                                  gameHeight);
+
     CGFloat chromeScale = std::min<CGFloat>(1.0, std::max<CGFloat>(0.62, self.view.bounds.size.width / 800.0));
     CGFloat left = insets.left + 22.0 * chromeScale;
     CGFloat top = insets.top + 16.0 * chromeScale;
