@@ -1,0 +1,27 @@
+name: Build BellPad iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: brew install cmake ninja ripgrep sdl2
+
+      - name: Build unsigned IPA
+        run: ./scripts/package-unsigned-ipa.sh
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: BellPad-iOS-unsigned
+          path: dist/Bellpad-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
