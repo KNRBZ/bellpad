@@ -18,6 +18,37 @@ esac
 "$script_dir/fetch-desktop-baseline.sh"
 "$script_dir/fetch-aurora.sh"
 
+# Aurora already contains the complete aspect-fit presentation path. BellPad
+# deliberately enables it before Aurora creates its WebGPU swapchain so the
+# GameCube's native 4:3 framebuffer is centered on wide iPhone displays.
+# The Aurora helper is internal to the pinned C++ library, so the port calls
+# its Itanium-mangled symbol from this C translation unit without changing the
+# upstream Aurora source or its pinned submodule.
+python3 - "$core_dir/pc/src/pc_aurora_main.c" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+decl = '''extern void bellpad_set_frame_buffer_aspect_fit(bool fit)
+    __asm__("_ZN6aurora6window27set_frame_buffer_aspect_fitEb");
+'''
+if decl not in text:
+    marker = 'extern void pc_audio_shutdown(void);\n'
+    if marker not in text:
+        raise SystemExit("Could not find Aurora extern declarations in pc_aurora_main.c")
+    text = text.replace(marker, marker + decl, 1)
+
+call = '    bellpad_set_frame_buffer_aspect_fit(true);\n'
+needle = '    AuroraInfo info = aurora_initialize(argc, argv, &config);\n'
+if call not in text:
+    if needle not in text:
+        raise SystemExit("Could not find aurora_initialize call in pc_aurora_main.c")
+    text = text.replace(needle, call + needle, 1)
+
+path.write_text(text)
+PY
+
 # One version for the app, its release and PadMint: version.json, stamped into
 # a copy of the product Info.plist.
 mkdir -p "$build_dir"
